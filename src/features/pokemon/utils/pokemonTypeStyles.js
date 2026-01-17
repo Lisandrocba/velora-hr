@@ -72,3 +72,9 @@ export const POKEMON_TYPE_STYLES = {
     title: "text-neutral-700",
   },
 };
+
+export const QUERY_MODE = {
+  LIST: "list",
+  SEARCH: "search",
+  TYPE: "type",
+};
