@@ -4,6 +4,7 @@ import PokemonPage from "../features/pokemon/page/PokemonPage";
 import TeamsPage from "../features/teams/page/TeamsPage";
 import BattlePage from "../features/battle/page/BattlePage";
 import "./App.css";
+import CreateTeamPage from "../features/teams/page/CreateTeamPage";
 
 function App() {
   return (
@@ -11,8 +12,9 @@ function App() {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Navigate to="/pokemons" replace />} />
-          <Route path="pokemons" element={<PokemonPage />} />
+          <Route path="pokemons" element={<PokemonPage mode="view" />} />
           <Route path="teams" element={<TeamsPage />} />
+          <Route path="teams/create" element={<CreateTeamPage />} />
           <Route path="battles" element={<BattlePage />} />
         </Route>
       </Routes>
