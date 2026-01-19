@@ -6,6 +6,7 @@ const Select = ({
   placeholder,
   className = "",
 }) => {
+  console.log(options);
   return (
     <div className={`flex flex-col gap-1 items-start ${className}`}>
       {label && (

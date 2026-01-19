@@ -1,13 +1,15 @@
-import { Sword, Shield, Lightning } from "phosphor-react";
+import { Sword, Shield, Lightning, Plus, Minus } from "phosphor-react";
 import { POKEMON_TYPE_STYLES } from "../utils/pokemonTypeStyles";
+import useTeamStore from "../../../store/useTeamStore";
 
 const DEFAULT_TYPE_STYLE = {
   background: "bg-gray-100",
   title: "text-gray-700",
 };
 
-const PokemonCard = ({ pokemon }) => {
+const PokemonCard = ({ pokemon, mode }) => {
   const mainType = pokemon.types?.[0];
+  const { addPokemon, removePokemon } = useTeamStore();
 
   const typeStyles = POKEMON_TYPE_STYLES[mainType] || DEFAULT_TYPE_STYLE;
 
@@ -43,6 +45,22 @@ const PokemonCard = ({ pokemon }) => {
           </p>
         </div>
       </div>
+      {mode === "create" && (
+        <button
+          onClick={() => addPokemon(pokemon)}
+          className="flex flex-col items-center p-2 rounded-4xl bg-gray-300 hover:bg-yellow-300 mt-4 cursor-pointer"
+        >
+          <Plus size={32} color="black" weight="bold" />
+        </button>
+      )}
+      {mode === "teamDelete" && (
+        <button
+          onClick={() => removePokemon(pokemon.id)}
+          className="flex flex-col items-center p-2 rounded-4xl bg-red-200 hover:bg-red-700 mt-4 cursor-pointer"
+        >
+          <Minus size={32} />
+        </button>
+      )}
     </div>
   );
 };

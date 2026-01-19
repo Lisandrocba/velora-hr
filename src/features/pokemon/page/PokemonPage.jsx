@@ -1,41 +1,49 @@
-import { useState } from "react";
 import PokemonCard from "../components/PokemonCard";
 import usePokemons from "../hooks/usePokemons";
 import { MagnifyingGlass } from "phosphor-react";
 import useTypes from "../hooks/useTypes";
 import Select from "../components/Select";
+import useFiltersStore from "../../../store/useFilterStore";
 
-const PokemonPage = () => {
-  const [searchInput, setSearchInput] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [valueType, setValueType] = useState("");
+const PokemonPage = ({ mode }) => {
+  const {
+    searchInput,
+    searchTerm,
+    selectedType,
+    isSearching,
+    setSearchInput,
+    executeSearch,
+    setSelectedType,
+    clearFilters,
+    clearSearch,
+  } = useFiltersStore();
 
   const infiniteQuery = usePokemons({
-    mode: valueType ? "type" : searchTerm ? "search" : "list",
+    mode: selectedType ? "type" : searchTerm ? "search" : "list",
     name: searchTerm,
-    typeUrl: valueType,
+    typeUrl: selectedType,
   });
-
-  console.log(infiniteQuery);
 
   const { data } = useTypes();
 
-  const isSearching = searchTerm.length > 0;
+  const isFilterActive = isSearching() || selectedType;
 
-  const pokemons =
-    isSearching || valueType
-      ? infiniteQuery.data
-      : infiniteQuery.data?.pages.flat();
+  const pokemons = isFilterActive
+    ? infiniteQuery.data
+    : infiniteQuery.data?.pages.flat();
 
   const handleSearch = () => {
-    setSearchTerm(searchInput.trim().toLowerCase());
-    setValueType("");
+    executeSearch();
+    setSelectedType("");
+  };
+
+  const handleTypeChange = (typeUrl) => {
+    setSelectedType(typeUrl);
+    clearSearch();
   };
 
   const handleClear = () => {
-    setSearchInput("");
-    setSearchTerm("");
-    setValueType("");
+    clearFilters();
   };
 
   if (infiniteQuery.isLoading)
@@ -45,7 +53,7 @@ const PokemonPage = () => {
 
   return (
     <div className="">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Pokédex</h1>
+      <h1 className="text-4xl font-bold text-gray-900 mb-6">Pokédex</h1>
 
       <div className="flex gap-2 mb-6">
         <div className="flex flex-row justify-between items-end p-0 w-full">
@@ -60,14 +68,14 @@ const PokemonPage = () => {
             <button
               onClick={handleSearch}
               disabled={!searchInput.trim()}
-              className="bg-blue-600 text-white px-4 rounded flex items-center justify-center disabled:opacity-50"
+              className="bg-yellow-300 text-gray-800 px-4 rounded flex items-center justify-center disabled:opacity-50 cursor-pointer"
             >
               <MagnifyingGlass size={20} weight="bold" />
             </button>
-            {(isSearching || valueType) && (
+            {isFilterActive && (
               <button
                 onClick={handleClear}
-                className="bg-gray-300 text-gray-800 px-4 rounded"
+                className="px-4 rounded cursor-pointer bg-gray-800 text-white"
               >
                 Limpiar
               </button>
@@ -80,8 +88,8 @@ const PokemonPage = () => {
                 data?.map((type) => ({ value: type.url, label: type.name })) ||
                 []
               }
-              value={valueType}
-              onChange={setValueType}
+              value={selectedType}
+              onChange={handleTypeChange}
               placeholder="Seleccione un tipo"
             />
           </div>
@@ -90,15 +98,15 @@ const PokemonPage = () => {
 
       <div className="flex flex-row gap-4 flex-wrap justify-center">
         {pokemons?.map((pokemon) => (
-          <PokemonCard key={pokemon.id} pokemon={pokemon} />
+          <PokemonCard key={pokemon.id} pokemon={pokemon} mode={mode} />
         ))}
       </div>
 
-      {!isSearching && infiniteQuery.hasNextPage && !valueType && (
+      {!isFilterActive && infiniteQuery.hasNextPage && (
         <button
           onClick={() => infiniteQuery.fetchNextPage()}
           disabled={infiniteQuery.isFetchingNextPage}
-          className="bg-gray-300 text-xl px-8 py-2 rounded mt-8 cursor-pointer"
+          className="bg-gray-800 text-xl px-8 py-2 rounded mt-8 cursor-pointer"
         >
           {infiniteQuery.isFetchingNextPage ? "Cargando..." : "Ver más"}
         </button>
