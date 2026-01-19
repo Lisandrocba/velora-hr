@@ -17,8 +17,6 @@ const BattlePage = () => {
     isBattleFinished,
   } = useBattleStore();
 
-  console.log({ battleRounds, battleResult, isBattleFinished });
-
   const handleSelectTeamA = (teamId) => {
     const team = teams.find((t) => t.id === teamId);
     setTeamA(team);
